@@ -37,7 +37,7 @@ var setUpPeople = function(){
           for (var i = 0; i < 50; i++) {
               var person = new Person();
               person.bank_account = faker.finance.amount();
-              person.birth_date = faker.date.past(),
+              person.birth_date = faker.date.between('1/1/1900', '1/1/2000'),
               person.country = faker.address.country(),
               person.img = faker.image.avatar(),
               person.username = faker.internet.userName(),
@@ -58,17 +58,22 @@ var setUpPeople = function(){
 
 setUpPeople();
 
-
-//THE JSON RESPONSE BELOW SHOULD ONLY SEND AN ARRAY FULL OF PEOPLE
-//EACH PERSON OBJECT SHOULD ONLY HAVE THEIR USERNAME, IMG, COUNTRY, AND DATE OF BIRTH
-
 router.route('/people')
   .get(function(req, res){
     Person.find(function(err, people){
       if(err){
         return next(err);
       } else {
-        res.json(data)
+
+        var myPeople = people.map(function(item){
+          return { username: item.username , 
+                   img: item.img, 
+                   country: item.country, 
+                   dob: item.birth_date   
+                 }
+        });
+
+        res.json(myPeople)
       }
     })
   });
